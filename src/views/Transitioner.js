@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View ,Easing, Platform } from 'react-native';
 
 import invariant from '../utils/invariant';
 
@@ -18,6 +18,8 @@ import type {
   NavigationTransitionProps,
   NavigationTransitionSpec,
 } from '../TypeDefinition';
+
+import CardStackStyleInterpolator from './CardStackStyleInterpolator';
 
 type Props = {
   configureTransition: (
@@ -42,6 +44,19 @@ type State = {
 };
 
 const DefaultTransitionSpec = TransitionConfigs.DefaultTransitionSpec;
+const IOSTransitionSpec = ({
+  duration: 500,
+  easing: Easing.bezier(0.2833, 0.99, 0.31833, 0.99),
+  timing: Animated.timing,
+}: NavigationTransitionSpec);
+
+const ModalSlideFromBottomIOS = ({
+  transitionSpec: IOSTransitionSpec,
+  screenInterpolator: CardStackStyleInterpolator.forVertical,
+  containerStyle: {
+    backgroundColor: '#000',
+  },
+}: TransitionConfig);
 
 class Transitioner extends React.Component<*, Props, State> {
   _onLayout: (event: any) => void;
@@ -137,9 +152,15 @@ class Transitioner extends React.Component<*, Props, State> {
     this._prevTransitionProps = this._transitionProps;
     this._transitionProps = buildTransitionProps(nextProps, nextState);
 
+    let {index, routes} = nextProps.navigation.state;
+
+    let configureTransition = nextProps.configureTransition;
+    if (routes[index].params && routes[index].params.mode === 'modal' && Platform.OS != 'android') {
+      configureTransition = ModalSlideFromBottomIOS;
+    }
     // get the transition spec.
-    const transitionUserSpec = nextProps.configureTransition
-      ? nextProps.configureTransition(
+    const transitionUserSpec = configureTransition
+      ? configureTransition(
           this._transitionProps,
           this._prevTransitionProps
         )
