@@ -238,8 +238,13 @@ class CardStack extends Component {
       floatingHeader = this._renderHeader(this.props.scene, headerMode);
     }
     const { navigation, position, layout, scene, scenes, mode } = this.props;
-    const { index } = navigation.state;
-    const isVertical = mode === 'modal';
+    const { index, params } = navigation.state;
+
+    let isVertical = mode === 'modal';
+
+    if (params && params.mode && params.mode === 'modal') {
+      isVertical = true;
+    }
 
     const responder = PanResponder.create({
       onPanResponderTerminate: () => {
