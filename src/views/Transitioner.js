@@ -154,18 +154,17 @@ class Transitioner extends React.Component<*, Props, State> {
 
     let {index, routes} = nextProps.navigation.state;
 
-    let configureTransition = nextProps.configureTransition;
-    if (routes[index].params && routes[index].params.mode === 'modal' && Platform.OS != 'android') {
-      configureTransition = ModalSlideFromBottomIOS;
-    }
     // get the transition spec.
-    const transitionUserSpec = configureTransition
-      ? configureTransition(
+    let transitionUserSpec = nextProps.configureTransition
+      ? nextProps.configureTransition(
           this._transitionProps,
           this._prevTransitionProps
         )
       : null;
 
+    if (routes[index].params && routes[index].params.mode === 'modal' && Platform.OS != 'android') {
+      transitionUserSpec = ModalSlideFromBottomIOS;
+    }
     const transitionSpec = {
       ...DefaultTransitionSpec,
       ...transitionUserSpec,
