@@ -74,14 +74,7 @@ class CardStackTransitioner extends Component<DefaultProps, Props, void> {
     // props for the old screen
     prevTransitionProps: NavigationTransitionProps
   ) => {
-    let {index, routes} = this.props.navigation;
-
-    let mode = this.props.mode;
-    if (routes[index].params && routes[index].params.mode && routes[index].params.mode === 'modal') {
-      mode = routes[index].params.mode;
-    }
-
-    const isModal = mode === 'modal';
+    const isModal = this.props.mode === 'modal';
     // Copy the object so we can assign useNativeDriver below
     // (avoid Flow error, transitionSpec is of type NavigationTransitionSpec).
     const transitionSpec = {
